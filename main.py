@@ -8,10 +8,10 @@ from preprocess import make_env
 if __name__ == "__main__":
 
     algorithms = {
-        "DQN": "from DQN.DQNAgent import Agent",
-        "DDQN": "from DDQN.DDQNAgent import Agent",
-        "DuDQN": "from DuDQN.DuDQNAgent import Agent",
-        "DuDDQN": "from DuDDDQN.DuDDQNAgent import Agent",
+        "DQN": "from agents.DQNAgent import DQNAgent as Agent",
+        "DDQN": "from agents.DDQNAgent import DDQNAgent as Agent",
+        "DuDQN": "from agents.DuDQNAgent import DuDQNAgent as Agent",
+        "DuDDQN": "from agents.DuDDQNAgent import DuDDQNAgent as Agent",
     }
 
     parser = argparse.ArgumentParser(description="A script to train and test DQN based algorithms for atari games.")
@@ -51,13 +51,14 @@ if __name__ == "__main__":
                   no_ops=args.no_ops)
     
     best_score = -np.inf
+    dueling = True if args.alg in ["DuDQN", "DuDDQN"] else False
 
     agent = Agent(gamma=args.gamma, epsilon=args.epsilon, lr=args.lr,
                   input_dims=env.observation_space.shape, n_actions=env.action_space.n,
                   memory_size=args.memory_size, batch_size=args.batch_size,
                   eps_min=args.eps_min, decay_rate=args.decay_rate,
                   replace=args.update_every, checkpoint_dir=args.checkpoint_dir, env_name=args.env,
-                  algo=args.alg)
+                  algo=args.alg, dueling=dueling)
     print(agent.__dict__)
     n_steps = 0
     scores, eps_history, steps_history = [], [], []
