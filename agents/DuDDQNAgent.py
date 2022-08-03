@@ -1,8 +1,16 @@
 import numpy as np
 import torch as T
-from agents.DQNAgent import DQNAgent
+from agents.base_agent import BaseAgent
+from nets.dueling_network import DuDQN
 
-class DuDDQNAgent(DQNAgent):
+class DuDDQNAgent(BaseAgent):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.Q_next = DuDQN(self.lr, self.n_actions, name=f"{self.env_name}_{self.algo}_q_next",
+                        input_dims=self.input_dims, checkpoint_dir=self.checkpoint_dir)
+        self.Q_eval =  DuDQN(self.lr, self.n_actions, name=f"{self.env_name}_{self.algo}_q_eval",
+                        input_dims=self.input_dims, checkpoint_dir=self.checkpoint_dir)
+                        
     def choose_action(self, observation):
         if np.random.random() > self.epsilon:
             state = T.tensor(np.array([observation]), dtype=T.float).to(self.Q_eval.device) # batch_size * input_dims

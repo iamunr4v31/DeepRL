@@ -51,14 +51,13 @@ if __name__ == "__main__":
                   no_ops=args.no_ops)
     
     best_score = -np.inf
-    dueling = True if args.alg in ["DuDQN", "DuDDQN"] else False
 
     agent = Agent(gamma=args.gamma, epsilon=args.epsilon, lr=args.lr,
                   input_dims=env.observation_space.shape, n_actions=env.action_space.n,
                   memory_size=args.memory_size, batch_size=args.batch_size,
                   eps_min=args.eps_min, decay_rate=args.decay_rate,
                   replace=args.update_every, checkpoint_dir=args.checkpoint_dir, env_name=args.env,
-                  algo=args.alg, dueling=dueling)
+                  algo=args.alg)
     print(agent.__dict__)
     n_steps = 0
     scores, eps_history, steps_history = [], [], []

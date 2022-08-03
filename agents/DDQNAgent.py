@@ -1,8 +1,27 @@
-from agents.DQNAgent import DQNAgent
+from agents.base_agent import BaseAgent
+from nets.dqn import DQN
 import numpy as np
 import torch as T
 
-class DDQNAgent(DQNAgent):
+class DDQNAgent(BaseAgent):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.Q_eval = DQN(self.lr, self.n_actions, name=f"{self.env_name}_{self.algo}_q_eval",
+                        input_dims=self.input_dims, checkpoint_dir=self.checkpoint_dir)
+        
+        self.Q_next = DQN(self.lr, self.n_actions, name=f"{self.env_name}_{self.algo}_q_eval",
+                        input_dims=self.input_dims, checkpoint_dir=self.checkpoint_dir)
+
+    def choose_action(self, observation):
+        if np.random.random() > self.epsilon:
+            state = T.tensor(np.array([observation]), dtype=T.float).to(self.Q_eval.device) # batch_size * input_dims
+            q_values = self.Q_eval.forward(state)
+            action = T.argmax(q_values).item()
+        else:
+            action = np.random.choice(self.action_space)
+        
+        return action
+                                
     def learn(self):
         if self.memory.memory_counter >= self.batch_size:
             self.Q_eval.optimizer.zero_grad()
